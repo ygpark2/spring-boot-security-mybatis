@@ -1,0 +1,103 @@
+
+### This is the main way to configure the application (other than annotations).
+### This fils is in Yaml format but you can also do this using the traditional
+### Java properties file.
+
+spring:
+  profiles:
+    active: web
+  # IDENTITY (ContextIdApplicationContextInitializer)
+  application:
+    name: kdn-ecsi-epengine
+    index: index
+
+  boot:
+    admin:
+      username: demo
+      password: 123
+      url: http://localhost:8088
+
+  # DataSource
+  datasource:
+    # name= # name of the data source
+    # initialize=true # populate using data.sql.bak
+    # schema= # a schema (DDL) script resource reference
+    # data= # a data (DML) script resource reference
+    # sqlScriptEncoding= # a charset for reading SQL scripts
+    # platform= # the platform to use in the schema resource (schema-${platform}.sql)
+    continueOnError: false
+    separator: ;
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.10.17/KEVCOS_SPC
+    username: yjchoi
+    password: yjchoi1234
+    max-active: 100
+    max-idle: 8
+    min-idle: 8
+    initial-size: 10
+    validation-query: SELECT 1
+    test-on-borrow: false
+    test-on-return: false
+    # test-while-idle:
+    # time-between-eviction-runs-millis:
+    # min-evictable-idle-time-millis:
+    # max-wait:
+
+  # JMX
+  jmx:
+    enabled: true
+
+  oxm:
+    package:
+      name: com.kdn.kevcs.mobile.domain.oxm.*
+
+  jersey:
+    resource:
+      package: com.kdn.kevcs.mobile.web.resource
+
+
+  ## THYMELEAF (ThymeleafAutoConfiguration)
+  thymeleaf:
+    cache: false
+
+mybatis:
+  # config: mybatis-config.xml # mybatis config file
+  mapperLocations: classpath:/mapper/**/*.xml # mappers file
+  # mapperLocations: classpath:mapper/User/User.xml # mappers file
+  typeAliasesPackage: com.kdn.kevcs.mobile.domain.entity # domain object's package
+  # typeHandlersPackage: # handler's package
+  # check-config-location: true # check the mybatis configuration exists
+  # executorType: SIMPLE # mode of execution. Default is SIMPLE
+
+# LOGGING
+logging:
+  path: ./logs/
+  # file: myapp.log # cannot set file, path at the same time.
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate: ERROR
+  # config: log4j2.xml
+
+server:
+  port: 9000
+#   context-path: /kevcs
+
+# Management
+# management.security.enabled=false
+management:
+  port: 8081
+  address: localhost
+  context-path: /manage
+
+security:
+  user:
+    name: demo
+    password: 123
+
+endpoints:
+  health:
+    enabled: true
+  jmx:
+    domain: myapp
+    unique-names: true
+

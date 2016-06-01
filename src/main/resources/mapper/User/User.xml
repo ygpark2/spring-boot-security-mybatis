@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kdn.kevcs.mobile.repository.UserRepository">
+
+    <resultMap id="userResultMap" type="User">
+        <id property="userNo" column="user_no" />
+        <result property="username" column="username" />
+        <result property="password" column="password" />
+        <result property="accountExpired" column="account_expired" />
+        <result property="accountLocked" column="account_locked" />
+        <result property="credentialsExpired" column="credentials_expired" />
+        <result property="accountEnabled" column="account_enabled" />
+        <result property="name" column="name" />
+        <result property="stocId" column="stoc_id" />
+        <result property="csId" column="cs_id" />
+        <result property="roleCl" column="role_cl" />
+        <result property="authorities" column="authorities" />
+    </resultMap>
+
+    <select id="find" resultMap="userResultMap">
+        SELECT
+            USER_NO user_no,
+            USER_ID username,
+            0 accountExpired,
+            0 accountLocked,
+            0 credentialsExpired,
+            1 accountEnabled,
+            NM name,
+            STOC_ID stoc_id,
+            IFNULL(CS_ID,'1') AS CS_ID cs_id,
+            ROLE_CL role_cl,
+            "USER" authorities
+        FROM USER
+        <if test="pk">
+            WHERE user_no = #{pk.value}
+        </if>
+    </select>
+
+    <select id="findByUsername" resultMap="userResultMap" parameterType="string">
+        SELECT
+            USER_NO user_no,
+            USER_ID username,
+            CAST(AES_DECRYPT(UNHEX(PASSWD), MD5(#{userId})) AS CHAR) password,
+            0 accountExpired,
+            0 accountLocked,
+            0 credentialsExpired,
+            1 accountEnabled,
+            NM name,
+            STOC_ID stoc_id,
+            IFNULL(CS_ID,'1') AS cs_id,
+            ROLE_CL role_cl,
+            "USER" authorities
+        FROM USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+</mapper>

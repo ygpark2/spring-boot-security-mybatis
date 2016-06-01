@@ -1,0 +1,59 @@
+package com.kdn.kevcs.mobile.config;
+
+// import org.apache.commons.dbcp.BasicDataSource;
+
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.sql.DataSource;
+
+/**
+ * MyBatis의 sqlmap을 Mapper 기반으로 사용하기 위해 MapperScan을 추가한다.
+ * 
+ * @since 2015.11.11
+ * @author 박영규
+ */
+@Configuration
+@EnableTransactionManagement
+@MapperScan(basePackages="com.kdn.kevcs.mobile.repository")
+public class MyBatisConfig {
+
+    @Bean
+    @ConfigurationProperties("spring.datasource")
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    public SqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) throws Exception {
+        PathMatchingResourcePatternResolver pmrpr = new PathMatchingResourcePatternResolver();
+        final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+        sessionFactory.setDataSource(dataSource());
+        sessionFactory.setConfigLocation(pmrpr.getResource("classpath:mybatis-config.xml"));
+        // sessionFactory.setConfigLocation(new ClassPathResource("/mybatis-config.xml"));
+        sessionFactory.setMapperLocations(pmrpr.getResources("classpath:mapper/**/*.xml"));
+        sessionFactory.setTypeAliasesPackage("com.kdn.kevcs.mobile.domain.entity");
+        return sessionFactory;
+    }
+
+    @Bean
+    public DataSourceTransactionManager transactionManager() {
+        return new DataSourceTransactionManager(dataSource());
+    }
+
+    @Bean
+    public SqlSession sqlSessionForMyBatis(SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
+    }
+}
